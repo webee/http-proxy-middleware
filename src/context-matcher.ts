@@ -1,10 +1,38 @@
-import type { Filter, Request } from './types';
+import type { BaseFilter, Filter, Request } from './types';
 import * as isGlob from 'is-glob';
 import * as micromatch from 'micromatch';
 import * as url from 'url';
 import { ERRORS } from './errors';
 
 export function match(context: Filter, uri: string, req: Request): boolean {
+  // support RegExp for exactly match
+  let finalContext: BaseFilter = [];
+  const patterns: RegExp[] = [];
+  if (Array.isArray(context)) {
+    context.forEach((p) => {
+      if (p instanceof RegExp) {
+        patterns.push(p);
+      } else {
+        (finalContext as string[]).push(p);
+      }
+    });
+  } else if (context instanceof RegExp) {
+    patterns.push(context);
+  } else {
+    finalContext = context;
+  }
+
+  if (patterns.length > 0) {
+    return (
+      patterns.some((pat) => pat.test(uri)) ||
+      (finalContext.length > 0 && baseMatch(finalContext, uri, req))
+    );
+  } else {
+    return baseMatch(finalContext, uri, req);
+  }
+}
+
+export function baseMatch(context: BaseFilter, uri: string, req: Request): boolean {
   // single path
   if (isStringPath(context as string)) {
     return matchSingleStringPath(context as string, uri);

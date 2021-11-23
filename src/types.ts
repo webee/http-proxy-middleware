@@ -11,16 +11,21 @@ import type * as httpProxy from 'http-proxy';
 import type * as net from 'net';
 import type * as url from 'url';
 
-export interface Request extends express.Request {}
+export interface Request extends express.Request {
+  preRewriteUrl: string;
+}
 export interface Response extends express.Response {}
 
 export interface RequestHandler extends express.RequestHandler {
   upgrade?: (req: Request, socket: net.Socket, head: any) => void;
 }
 
-export type Filter = string | string[] | ((pathname: string, req: Request) => boolean);
+export type BaseFilter = string | string[] | ((pathname: string, req: Request) => boolean);
+
+export type Filter = BaseFilter | RegExp | (string | RegExp)[] | RegExp[];
 
 export interface Options extends httpProxy.ServerOptions {
+  preproxy?: PreproxyCallback;
   pathRewrite?:
     | { [regexp: string]: string }
     | ((path: string, req: Request) => string)
@@ -53,6 +58,11 @@ type Logger = (...args: any[]) => void;
 
 export type LogProviderCallback = (provider: LogProvider) => LogProvider;
 
+export type PreproxyCallback = (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  options?: httpProxy.ServerOptions
+) => boolean | void | Promise<boolean | void>;
 /**
  * Use types based on the events listeners from http-proxy
  * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/51504fd999031b7f025220fab279f1b2155cbaff/types/http-proxy/index.d.ts

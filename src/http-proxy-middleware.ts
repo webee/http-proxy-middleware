@@ -54,7 +54,12 @@ export class HttpProxyMiddleware {
     if (this.shouldProxy(this.config.context, req)) {
       try {
         const activeProxyOptions = await this.prepareProxyRequest(req);
-        this.proxy.web(req, res, activeProxyOptions);
+        if (
+          !activeProxyOptions.preproxy ||
+          (await activeProxyOptions.preproxy(req, res, activeProxyOptions))
+        ) {
+          this.proxy.web(req, res, activeProxyOptions);
+        }
       } catch (err) {
         next(err);
       }
@@ -127,6 +132,7 @@ export class HttpProxyMiddleware {
   private prepareProxyRequest = async (req: Request) => {
     // https://github.com/chimurai/http-proxy-middleware/issues/17
     // https://github.com/chimurai/http-proxy-middleware/issues/94
+    req.preRewriteUrl = req.url;
     req.url = req.originalUrl || req.url;
 
     // store uri before it gets rewritten for logging
