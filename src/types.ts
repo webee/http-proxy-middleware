@@ -32,6 +32,7 @@ export interface Options extends httpProxy.ServerOptions {
   logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'silent';
   logProvider?: LogProviderCallback;
 
+  onStart?: OnStartCallback;
   onError?: OnErrorCallback;
   onProxyRes?: OnProxyResCallback;
   onProxyReq?: OnProxyReqCallback;
@@ -56,6 +57,11 @@ export type LogProviderCallback = (provider: LogProvider) => LogProvider;
  * Use types based on the events listeners from http-proxy
  * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/51504fd999031b7f025220fab279f1b2155cbaff/types/http-proxy/index.d.ts
  */
+export type OnStartCallback = (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  target?: string | Partial<url.Url>
+) => void;
 export type OnErrorCallback = (
   err: Error,
   req: http.IncomingMessage,

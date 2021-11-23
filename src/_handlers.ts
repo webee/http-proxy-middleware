@@ -14,11 +14,19 @@ export function init(proxy: httpProxy, option: Options): void {
   logger.debug('[HPM] Subscribed to http-proxy events:', Object.keys(handlers));
 }
 
-type HttpProxyEventName = 'error' | 'proxyReq' | 'proxyReqWs' | 'proxyRes' | 'open' | 'close';
+type HttpProxyEventName =
+  | 'start'
+  | 'error'
+  | 'proxyReq'
+  | 'proxyReqWs'
+  | 'proxyRes'
+  | 'open'
+  | 'close';
 
 export function getHandlers(options: Options) {
   // https://github.com/nodejitsu/node-http-proxy#listening-for-proxy-events
   const proxyEventsMap: Record<HttpProxyEventName, string> = {
+    start: 'onStart',
     error: 'onError',
     proxyReq: 'onProxyReq',
     proxyReqWs: 'onProxyReqWs',
