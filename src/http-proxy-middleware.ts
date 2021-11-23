@@ -30,8 +30,11 @@ export class HttpProxyMiddleware {
     // attach handler to http-proxy events
     handlers.init(this.proxy, this.proxyOptions);
 
-    // log errors for debug purpose
-    this.proxy.on('error', this.logError);
+    if (!opts?.onError) {
+      // NOTE: add default error handler only when not supplied.
+      // log errors for debug purpose
+      this.proxy.on('error', this.logError);
+    }
 
     // https://github.com/chimurai/http-proxy-middleware/issues/19
     // expose function to upgrade externally
