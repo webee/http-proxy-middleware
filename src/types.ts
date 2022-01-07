@@ -61,7 +61,7 @@ export type LogProviderCallback = (provider: LogProvider) => LogProvider;
 export type PreproxyCallback = (
   req: http.IncomingMessage,
   res: http.ServerResponse,
-  options?: httpProxy.ServerOptions
+  options: httpProxy.ServerOptions
 ) => boolean | void | Promise<boolean | void>;
 /**
  * Use types based on the events listeners from http-proxy
